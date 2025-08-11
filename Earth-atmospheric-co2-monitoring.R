@@ -350,6 +350,10 @@ mt_tilde <- draw_plot_month_compare(mt_NX,
                                     yhline_size=1,
                                     yhline_color="grey70")
 
-# mt monte carlo
- set.seed(123)
+# permutation monte carlo is used to infer the extreme 
+# The result is rank, p_value and color_tag, see paper for color definition
+# Then, you can overlay color on the time series plot.
+# This function can also be used on spatial map to get the permuation monte carlo result
+#   by feeding spatial values to the function.
+set.seed(123)
 df_permute_res <- calculate_permutation_ranks(mt_NX$mean)
