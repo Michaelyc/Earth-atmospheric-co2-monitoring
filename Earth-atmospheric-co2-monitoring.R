@@ -349,3 +349,7 @@ mt_tilde <- draw_plot_month_compare(mt_NX,
                                     yhline_intercept=0.0,
                                     yhline_size=1,
                                     yhline_color="grey70")
+
+# mt monte carlo
+ set.seed(123)
+df_permute_res <- calculate_permutation_ranks(mt_NX$mean)
