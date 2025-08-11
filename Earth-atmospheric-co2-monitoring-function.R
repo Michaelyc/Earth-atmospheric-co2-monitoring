@@ -516,3 +516,57 @@ draw_plot_month_compare <- function(draw_df,
   return(tmpplot)
 }
 
+calculate_permutation_ranks <- function(input_vector) {
+  
+  # Validate input
+  if (!is.numeric(input_vector) || !is.vector(input_vector)) {
+    stop("Input must be a numeric vector.")
+  }
+  
+  # Generate permutation matrix
+  perm_matrix <- replicate(999, sample(input_vector))
+  colnames(perm_matrix) <- paste0("perm_", 1:999)
+  
+  # Combine original vector with permutations
+  full_matrix <- cbind(original = as.vector(input_vector), perm_matrix)
+  
+  # Get ranks of the original values across permutations
+  rank_m_x <- apply(full_matrix, 1, function(row) rank(row)[1])
+  
+  # Create output data frame
+  df_permute_res <- data.frame(ranks = rank_m_x)
+  
+  # Add p-values and color tags
+  df_permute_res <- df_permute_res %>%
+    dplyr::mutate(
+      p_value = if_else(ranks >= 500,
+                        (1000 - ranks) / 1000,
+                        ranks / 1000),
+      # color_tag_1 = case_when(
+      #   ranks >= 500 & p_value < 0.01 ~ "red4",
+      #   ranks < 500 & p_value < 0.01 ~ "blue3",
+      #   TRUE ~ "white"
+      # ),
+      # color_tag_2 = case_when(
+      #   ranks >= 500 & p_value < 0.05 ~ "red",
+      #   ranks < 500 & p_value < 0.05 ~ "steelblue3",
+      #   TRUE ~ "white"
+      # ),
+      # color_tag_3 = case_when(
+      #   ranks >= 500 & p_value < 0.1 ~ "pink2",
+      #   ranks < 500 & p_value < 0.1 ~ "lightblue1",
+      #   TRUE ~ "white"
+      # ),
+      color_tag = case_when(
+        ranks >= 500 & p_value < 0.01 ~ "red4",
+        ranks < 500 & p_value < 0.01 ~ "blue3",
+        ranks >= 500 & p_value < 0.05 ~ "red",
+        ranks < 500 & p_value < 0.05 ~ "steelblue3",
+        ranks >= 500 & p_value < 0.1 ~ "pink2",
+        ranks < 500 & p_value < 0.1 ~ "lightblue1",
+        TRUE ~ "white"
+      )
+    )
+  
+  return(df_permute_res)
+}
